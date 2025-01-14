@@ -11,7 +11,7 @@ import (
 
 func main() {
 	randNumChan := make(chan int, 10)
-	resultChan := make(chan string, 10)
+	resultChan := make(chan string)
 	go func() {
 		for i := 0; i < 10; i++ {
 			randomNum(randNumChan)
