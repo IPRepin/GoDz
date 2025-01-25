@@ -49,41 +49,33 @@ func (handler *VerifyHandler) saveVerificationData(email, hash string) error {
 	handler.mu.Lock()
 	defer handler.mu.Unlock()
 
-	// Чтение существующих данных из файла
 	data, err := handler.readVerificationData()
 	if err != nil {
 		return err
 	}
 
-	// Добавление новой записи
 	data = append(data, VerificationData{Email: email, Hash: hash})
 
-	// Сериализация данных в JSON
 	file, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	// Запись данных в файл
 	return os.WriteFile("hash.json", file, 0644)
 }
 
-// readVerificationData читает данные из файла hash.json
 func (handler *VerifyHandler) readVerificationData() ([]VerificationData, error) {
 	var data []VerificationData
 
-	// Проверяем, существует ли файл
 	if _, err := os.Stat("hash.json"); os.IsNotExist(err) {
-		return data, nil // Файл не существует, возвращаем пустой список
+		return data, nil
 	}
 
-	// Чтение файла
 	file, err := os.ReadFile("hash.json")
 	if err != nil {
 		return nil, err
 	}
 
-	// Десериализация данных
 	err = json.Unmarshal(file, &data)
 	if err != nil {
 		return nil, err
@@ -92,7 +84,6 @@ func (handler *VerifyHandler) readVerificationData() ([]VerificationData, error)
 	return data, nil
 }
 
-// deleteVerificationData удаляет запись из файла hash.json
 func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 	handler.mu.Lock()
 	defer handler.mu.Unlock()
@@ -103,7 +94,6 @@ func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 		return err
 	}
 
-	// Удаление записи с указанным hash
 	newData := make([]VerificationData, 0)
 	for _, item := range data {
 		if item.Hash != hash {
@@ -111,13 +101,11 @@ func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 		}
 	}
 
-	// Сериализация обновленных данных в JSON
 	file, err := json.MarshalIndent(newData, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	// Запись обновленных данных в файл
 	return os.WriteFile("hash.json", file, 0644)
 }
 
@@ -167,9 +155,29 @@ func (handler *VerifyHandler) SendEmail() http.HandlerFunc {
 
 func (handler *VerifyHandler) VerifyGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := req.HandelBody[VerifyRequest](&w, r)
+		hash := r.PathValue("hash")
+
+		data, err := handler.readVerificationData()
 		if err != nil {
+			res.JsonResponse(w, "Failed to read verification data", http.StatusInternalServerError)
 			return
 		}
+
+		found := false
+		for _, item := range data {
+			if item.Hash == hash {
+				found = true
+				break
+			}
+		}
+
+		if found {
+			if err := handler.deleteVerificationData(hash); err != nil {
+				res.JsonResponse(w, "Failed to delete verification data", http.StatusInternalServerError)
+				return
+			}
+		}
+
+		res.JsonResponse(w, found, http.StatusOK)
 	}
 }
