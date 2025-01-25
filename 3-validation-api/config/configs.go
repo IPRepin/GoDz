@@ -8,6 +8,8 @@ import (
 
 type Config struct {
 	Auth AuthEmailConfig
+	File FileNameConfig
+	Url  UrlVerifyConfig
 }
 
 type AuthEmailConfig struct {
@@ -16,7 +18,14 @@ type AuthEmailConfig struct {
 	EmailAddress string
 	EmailHost    string
 	EmailPort    string
-	UrlVerify    string
+}
+
+type UrlVerifyConfig struct {
+	UrlVerify string
+}
+
+type FileNameConfig struct {
+	FileName string
 }
 
 func NewConfig() *Config {
@@ -31,6 +40,12 @@ func NewConfig() *Config {
 			EmailAddress: os.Getenv("ADDRESS"),
 			EmailHost:    os.Getenv("EMAIL_HOST"),
 			EmailPort:    os.Getenv("EMAIL_PORT"),
+		},
+		File: FileNameConfig{
+			FileName: os.Getenv("FILE_NAME"),
+		},
+		Url: UrlVerifyConfig{
+			UrlVerify: os.Getenv("URL_VERIFY"),
 		},
 	}
 }

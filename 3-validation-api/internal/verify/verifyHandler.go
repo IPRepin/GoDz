@@ -61,17 +61,17 @@ func (handler *VerifyHandler) saveVerificationData(email, hash string) error {
 		return err
 	}
 
-	return os.WriteFile("hash.json", file, 0644)
+	return os.WriteFile(handler.File.FileName, file, 0644)
 }
 
 func (handler *VerifyHandler) readVerificationData() ([]VerificationData, error) {
 	var data []VerificationData
 
-	if _, err := os.Stat("hash.json"); os.IsNotExist(err) {
+	if _, err := os.Stat(handler.File.FileName); os.IsNotExist(err) {
 		return data, nil
 	}
 
-	file, err := os.ReadFile("hash.json")
+	file, err := os.ReadFile(handler.File.FileName)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (handler *VerifyHandler) readVerificationData() ([]VerificationData, error)
 func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 	handler.mu.Lock()
 	defer handler.mu.Unlock()
-	
+
 	data, err := handler.readVerificationData()
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 		return err
 	}
 
-	return os.WriteFile("hash.json", file, 0644)
+	return os.WriteFile(handler.File.FileName, file, 0644)
 }
 
 func (handler *VerifyHandler) sendVerificationEmail(emailAddress, hash string) error {
@@ -113,7 +113,7 @@ func (handler *VerifyHandler) sendVerificationEmail(emailAddress, hash string) e
 	e.From = handler.Config.Auth.EmailAddress
 	e.To = []string{emailAddress}
 	e.Subject = "Verify your email"
-	verificationLink := handler.Auth.UrlVerify + hash
+	verificationLink := handler.Url.UrlVerify + hash
 	e.HTML = []byte(fmt.Sprintf("<h1>Click the link to verify your email: %s</h1>", verificationLink))
 
 	err := e.Send(
