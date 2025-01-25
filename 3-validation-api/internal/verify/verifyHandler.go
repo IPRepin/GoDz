@@ -87,8 +87,7 @@ func (handler *VerifyHandler) readVerificationData() ([]VerificationData, error)
 func (handler *VerifyHandler) deleteVerificationData(hash string) error {
 	handler.mu.Lock()
 	defer handler.mu.Unlock()
-
-	// Чтение существующих данных из файла
+	
 	data, err := handler.readVerificationData()
 	if err != nil {
 		return err
