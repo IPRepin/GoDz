@@ -36,33 +36,42 @@ func generateHash() (string, error) {
 	return fmt.Sprintf("%x", b), nil
 }
 
+func (handler *VerifyHandler) sendVerificationEmail(emailAddress, hash string) error {
+	e := email.NewEmail()
+	e.From = handler.Config.Auth.EmailAddress
+	e.To = []string{emailAddress}
+	e.Subject = "Verify your email"
+	verificationLink := fmt.Sprintf("http://localhost:8080/verify/%s", hash)
+	e.HTML = []byte(fmt.Sprintf("<h1>Click the link to verify your email: %s</h1>", verificationLink))
+
+	err := e.Send(
+		handler.Auth.EmailHost+":"+handler.Auth.EmailPort,
+		smtp.PlainAuth("", handler.Auth.EmailUser, handler.Auth.EmailPass, handler.Auth.EmailHost),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (handler *VerifyHandler) SendEmail() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request EmailRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			res.JsonResponse(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		hash, err := generateHash()
 		if err != nil {
-			http.Error(w, "Failed to generate verification hash", http.StatusInternalServerError)
+			res.JsonResponse(w, "Failed to generate verification hash", http.StatusInternalServerError)
 			return
 		}
-		e := email.NewEmail()
-		e.From = handler.Config.Auth.EmailAddress
-		e.To = []string{request.Email}
-		e.Subject = "Verify your email"
-		verificationLink := fmt.Sprintf("http://localhost:8080/verify/%s", hash)
-		e.HTML = []byte(fmt.Sprintf("<h1>Click the link to verify your email: %s</h1>", verificationLink))
-		err = e.Send(
-			handler.Auth.EmailHost+":"+handler.Auth.EmailPort,
-			smtp.PlainAuth("", handler.Auth.EmailUser, handler.Auth.EmailPass, handler.Auth.EmailHost),
-		)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := handler.sendVerificationEmail(request.Email, hash); err != nil {
+			res.JsonResponse(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		res.JsonResponse(w, request, http.StatusOK)
 	}
 }
