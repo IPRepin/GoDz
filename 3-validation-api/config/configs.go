@@ -16,6 +16,7 @@ type AuthEmailConfig struct {
 	EmailAddress string
 	EmailHost    string
 	EmailPort    string
+	UrlVerify    string
 }
 
 func NewConfig() *Config {
