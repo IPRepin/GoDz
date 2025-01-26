@@ -5,16 +5,17 @@ import (
 	"net/http"
 )
 
-func HandelBody[T any](w *http.ResponseWriter, r *http.Request) (*T, error) {
+func HandleBody[T any](w http.ResponseWriter, r *http.Request) (*T, error) {
 	body, err := Decode[T](r.Body)
 	if err != nil {
-		res.JsonResponse(*w, err.Error(), http.StatusBadRequest)
+		res.JsonResponse(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
 		return nil, err
 	}
-	err = Validate[T](body)
-	if err != nil {
-		res.JsonResponse(*w, err.Error(), http.StatusBadRequest)
+
+	if err := Validate(body); err != nil {
+		res.JsonResponse(w, map[string]string{"error": err.Error()}, http.StatusUnprocessableEntity)
 		return nil, err
 	}
+
 	return &body, nil
 }
