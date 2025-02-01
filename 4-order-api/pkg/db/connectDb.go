@@ -1,7 +1,6 @@
 package db
 
 import (
-	""
 	"godz/4-order-api/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

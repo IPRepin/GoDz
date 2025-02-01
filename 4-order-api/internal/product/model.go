@@ -6,15 +6,15 @@ import (
 
 type Product struct {
 	gorm.Model
-	title       string
-	price       float64
-	description string
+	Title       string
+	Price       float64
+	Description string
 }
 
 func NewProduct(title string, price float64, description string) *Product {
 	return &Product{
-		title:       title,
-		price:       price,
-		description: description,
+		Title:       title,
+		Price:       price,
+		Description: description,
 	}
 }

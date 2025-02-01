@@ -15,7 +15,7 @@ type DbConfig struct {
 }
 
 func GetConfig() Config {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("4-order-api/.env")
 	if err != nil {
 		log.Println("Error loading .env file")
 	}
