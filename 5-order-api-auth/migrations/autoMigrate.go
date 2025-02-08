@@ -2,23 +2,24 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"godz/4-order-api/internal/product"
+	"godz/5-order-api-auth/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"os"
 )
 
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
 	db, err := gorm.Open(postgres.Open(os.Getenv("DB_DNS")), &gorm.Config{})
 	if err != nil {
-		panic(err) // Лучше заменить на логирование и возврат ошибки
+		log.Println(err.Error())
 	}
-	err = db.AutoMigrate(&product.Product{})
+	err = db.AutoMigrate(&user.User{})
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
 }

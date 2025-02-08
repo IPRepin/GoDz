@@ -30,8 +30,8 @@ func getReadableError(err validator.FieldError) string {
 	switch err.Tag() {
 	case "required":
 		return fmt.Sprintf("Поле '%s' обязательно для заполнения", field)
-	case "email":
-		return "Некорректный формат email"
+	case "phone":
+		return "Некорректный формат phone"
 	case "min":
 		return fmt.Sprintf("Минимальная длина для '%s' - %s символов", field, err.Param())
 	case "max":
