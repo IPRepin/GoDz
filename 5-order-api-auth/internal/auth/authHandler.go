@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"fmt"
 	"godz/5-order-api-auth/configs"
 	"godz/5-order-api-auth/internal/user"
 	"godz/5-order-api-auth/pkg/jwt"
+	"godz/5-order-api-auth/pkg/middleware"
 	"godz/5-order-api-auth/pkg/req"
 	"godz/5-order-api-auth/pkg/res"
 	"net/http"
@@ -23,11 +25,15 @@ func NewAuthHandler(mux *http.ServeMux, deps AuthHandlerDeps) {
 	handler := &AuthHandler{
 		Config: deps.Config,
 	}
-	mux.HandleFunc("POST /auth", handler.Auth())
+	mux.HandleFunc("POST /auth", middleware.IsAuth(handler.Auth(), deps.Config))
 }
 
 func (handler *AuthHandler) Auth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		phone, ok := r.Context().Value(middleware.ContextPhoneKey).(string)
+		if ok {
+			fmt.Println(phone)
+		}
 		reqBody, err := req.HandleBody[AuthRequest](w, r)
 		if err != nil {
 			return
@@ -47,7 +53,9 @@ func (handler *AuthHandler) Auth() http.HandlerFunc {
 				http.Error(w, "Неверный код", http.StatusUnauthorized)
 				return
 			}
-			token, err := jwt.NewJWT(handler.Config.Auth.Secret).CreateToken(findUser)
+			token, err := jwt.NewJWT(handler.Config.Auth.Secret).CreateToken(jwt.JWTData{
+				Phone: findUser.Phone,
+			})
 			if err != nil {
 				http.Error(w, "Ошибка генерации токена", http.StatusInternalServerError)
 				return
