@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/joho/godotenv"
+	"godz/6-order-api-cart/internal/order"
+	"godz/6-order-api-cart/internal/product"
 	"godz/6-order-api-cart/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,7 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("6-order-api-cart/.env")
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -18,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	err = db.AutoMigrate(&user.User{})
+	err = db.AutoMigrate(&user.User{}, &product.Product{}, &order.Order{})
 	if err != nil {
 		log.Println(err.Error())
 	}

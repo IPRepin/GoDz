@@ -22,7 +22,7 @@ func writeUnauthorized(w http.ResponseWriter) {
 	}
 }
 
-func IsAuth(next http.Handler, config configs.Config) http.HandlerFunc {
+func IsAuth(next http.Handler, config *configs.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {

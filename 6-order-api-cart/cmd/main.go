@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"godz/6-order-api-cart/configs"
 	"godz/6-order-api-cart/internal/auth"
+	"godz/6-order-api-cart/internal/product"
 	"godz/6-order-api-cart/internal/user"
 	"godz/6-order-api-cart/pkg/db"
 	"godz/6-order-api-cart/pkg/middleware"
@@ -17,6 +18,7 @@ func main() {
 	router := http.NewServeMux()
 
 	userRepository := user.NewUserRepository(dataBase)
+	productRepository := product.NewProductRepo(dataBase)
 
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
 		UserRepo: userRepository,

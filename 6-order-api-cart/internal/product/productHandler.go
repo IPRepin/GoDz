@@ -33,7 +33,7 @@ func (handler *ProductHandler) CreateProduct() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		product := NewProduct(body.Title, body.Price, body.Description)
+		product := NewProduct(body.Title, body.Price, body.Description, body.ImageURL)
 
 		createdProduct, err := handler.ProductRepo.Create(product)
 		if err != nil {

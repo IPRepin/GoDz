@@ -9,12 +9,14 @@ type Product struct {
 	Title       string
 	Price       float64
 	Description string
+	ImageURL    string
 }
 
-func NewProduct(title string, price float64, description string) *Product {
+func NewProduct(title string, price float64, description, imageURL string) *Product {
 	return &Product{
 		Title:       title,
 		Price:       price,
 		Description: description,
+		ImageURL:    imageURL,
 	}
 }
