@@ -1,6 +1,8 @@
 package product
 
 import (
+	"godz/6-order-api-cart/configs"
+	"godz/6-order-api-cart/pkg/middleware"
 	"godz/6-order-api-cart/pkg/req"
 	"godz/6-order-api-cart/pkg/res"
 	"gorm.io/gorm"
@@ -14,17 +16,18 @@ type ProductHandler struct {
 
 type ProductHandlerDeps struct {
 	ProductRepo *ProductRepo
+	Config      *configs.Config
 }
 
 func NewProductHandler(mux *http.ServeMux, deps ProductHandlerDeps) {
 	handler := &ProductHandler{
 		ProductRepo: deps.ProductRepo,
 	}
-	mux.HandleFunc("POST /product", handler.CreateProduct())
-	mux.HandleFunc("GET /product", handler.GetProductById())
-	mux.HandleFunc("GET /products", handler.GetProducts())
-	mux.HandleFunc("PATCH /product/{id}", handler.UpdateProduct())
-	mux.HandleFunc("DELETE /product/{id}", handler.DeleteProduct())
+	mux.Handle("POST /product", middleware.IsAuth(handler.CreateProduct(), deps.Config))
+	mux.Handle("GET /product", middleware.IsAuth(handler.GetProductById(), deps.Config))
+	mux.Handle("GET /products", middleware.IsAuth(handler.GetProducts(), deps.Config))
+	mux.Handle("PATCH /product/{id}", middleware.IsAuth(handler.UpdateProduct(), deps.Config))
+	mux.Handle("DELETE /product/{id}", middleware.IsAuth(handler.DeleteProduct(), deps.Config))
 }
 
 func (handler *ProductHandler) CreateProduct() http.HandlerFunc {

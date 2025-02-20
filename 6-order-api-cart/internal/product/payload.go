@@ -13,3 +13,17 @@ type ProductUpdateRequest struct {
 	Description string  `json:"description" validate:"required"`
 	ImageURL    string  `json:"image_url" validate:"required"`
 }
+
+func ConvertProductRequests(requests []ProductCreateRequest) []Product {
+	var products []Product
+	for _, req := range requests {
+		prod := Product{
+			Title:       req.Title,
+			Price:       req.Price,
+			Description: req.Description,
+			ImageURL:    req.ImageURL,
+		}
+		products = append(products, prod)
+	}
+	return products
+}

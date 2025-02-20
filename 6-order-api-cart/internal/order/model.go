@@ -13,11 +13,16 @@ type Order struct {
 	ShippingAddress string
 }
 
-func (order *Order) NewOrder() *Order {
+func NewOrder(
+	userId uint,
+	totalPrice float64,
+	products []product.Product,
+	shippingAddress string,
+) *Order {
 	return &Order{
-		UserID:          order.UserID,
-		TotalPrice:      order.TotalPrice,
-		Products:        make([]product.Product, 0),
-		ShippingAddress: order.ShippingAddress,
+		UserID:          userId,
+		TotalPrice:      totalPrice,
+		Products:        products,
+		ShippingAddress: shippingAddress,
 	}
 }

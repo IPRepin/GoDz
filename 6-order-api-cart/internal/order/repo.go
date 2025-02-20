@@ -22,7 +22,7 @@ func (repo *OrderRepo) Create(order *Order) (*Order, error) {
 	return order, nil
 }
 
-func (repo *OrderRepo) GetById(id int) (*Order, error) {
+func (repo *OrderRepo) GetById(id uint) (*Order, error) {
 	var order Order
 	result := repo.DB.First(&order, id)
 	if result.Error != nil {

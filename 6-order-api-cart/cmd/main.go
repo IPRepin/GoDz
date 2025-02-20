@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"godz/6-order-api-cart/configs"
 	"godz/6-order-api-cart/internal/auth"
+	"godz/6-order-api-cart/internal/order"
 	"godz/6-order-api-cart/internal/product"
 	"godz/6-order-api-cart/internal/user"
 	"godz/6-order-api-cart/pkg/db"
@@ -19,10 +20,19 @@ func main() {
 
 	userRepository := user.NewUserRepository(dataBase)
 	productRepository := product.NewProductRepo(dataBase)
+	orderRepository := order.NewOrderRepo(dataBase)
 
 	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
 		UserRepo: userRepository,
 		Config:   conf,
+	})
+
+	product.NewProductHandler(router, product.ProductHandlerDeps{
+		ProductRepo: productRepository,
+	})
+
+	order.NewOrderHandler(router, order.OrderHandlerDeps{
+		OrderRepo: orderRepository,
 	})
 
 	stackMiddlewares := middleware.Chain(
