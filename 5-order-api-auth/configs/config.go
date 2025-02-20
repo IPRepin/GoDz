@@ -9,14 +9,18 @@ import (
 type Config struct {
 	DbConf DbConfig
 	Runs   RunsConfig
+	Auth   AuthConfig
 }
-
-type DbConfig struct {
-	DNS string
+type AuthConfig struct {
+	Secret string
 }
 
 type RunsConfig struct {
 	LetterRunes string
+}
+
+type DbConfig struct {
+	DNS string
 }
 
 func GetConfig() Config {
@@ -27,6 +31,9 @@ func GetConfig() Config {
 	return Config{
 		DbConf: DbConfig{
 			DNS: os.Getenv("DB_DNS"),
+		},
+		Auth: AuthConfig{
+			Secret: os.Getenv("KEY"),
 		},
 		Runs: RunsConfig{
 			LetterRunes: os.Getenv("LETTER_RUNES"),
